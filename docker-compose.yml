@@ -1,6 +1,37 @@
-version: '3.7'
 
 services:
+
+  traefik:
+    image: traefik:latest
+    container_name: passbolt_traefik
+
+    command:
+      # Uncomment when testing
+      # - --log.level=DEBUG
+
+      - --entrypoints.http.address=:80
+      - --entrypoints.https.address=:443
+
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+
+      - --api=true
+
+      # Uncomment when testing
+      # - --certificatesResolvers.letsencrypt.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
+
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http
+      - --certificatesresolvers.letsencrypt.acme.email=${APP_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+    volumes:
+      - letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+
   passbolt:
     image: passbolt/passbolt:latest-ce
     container_name: passbolt
@@ -9,15 +40,22 @@ services:
       - DATASOURCES_DEFAULT_USERNAME=${DATASOURCES_DEFAULT_USERNAME}
       - DATASOURCES_DEFAULT_PASSWORD=${DATASOURCES_DEFAULT_PASSWORD}
       - DATASOURCES_DEFAULT_DATABASE=${DATASOURCES_DEFAULT_DATABASE}
-      - APP_FULL_BASE_URL=${APP_FULL_BASE_URL}
+      - APP_FULL_BASE_URL=https://${APP_DOMAIN}
+      - EMAIL_DEFAULT_FROM=${APP_EMAIL}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.http.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.https.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.https.entrypoints=https
+      - traefik.http.routers.https.tls=true
+      - traefik.http.routers.https.tls.certresolver=${TRAEFIK_CERT_RESOLVER}
     volumes:
-      - passbolt_data:/usr/share/php/passbolt/config/gpg
-      - passbolt_images:/usr/share/php/passbolt/webroot/img/public
-    ports:
-      - "80:80"
-      - "443:443"
+      - passbolt_gpg:/etc/passbolt/gpg
+      - passbolt_jwt:/etc/passbolt/jwt
+    restart: unless-stopped
 
 volumes:
-  passbolt_data:
-  passbolt_images:
+  passbolt_gpg:
+  passbolt_jwt:
+  letsencrypt:
 

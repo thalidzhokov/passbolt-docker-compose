@@ -1,11 +1,25 @@
 
-
 services:
+
+  traefik:
+
+    labels:
+      - traefik.enable=true
+
+      - traefik.http.routers.traefik.rule=Host(`t.${APP_DOMAIN}`)
+      - traefik.http.routers.traefik.entrypoints=https
+      - traefik.http.routers.traefik.middlewares=auth
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.tls.certresolver=${TRAEFIK_CERT_RESOLVER}
+
+      - traefik.http.middlewares.to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD_HASH}
+
   passbolt:
     environment:
       - EMAIL_TRANSPORT_DEFAULT_HOST=${EMAIL_TRANSPORT_DEFAULT_HOST}
       - EMAIL_TRANSPORT_DEFAULT_PORT=${EMAIL_TRANSPORT_DEFAULT_PORT}
-      - EMAIL_DEFAULT_FROM=${EMAIL_DEFAULT_FROM}
     depends_on:
       - mariadb
       - smtp
@@ -20,6 +34,7 @@ services:
       - MYSQL_PASSWORD=${DATASOURCES_DEFAULT_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+    restart: unless-stopped
     ports:
       - "3306:3306"
 
@@ -28,6 +43,7 @@ services:
     container_name: passbolt_smtp
     environment:
       - RELAY_NETWORKS=:10.0.0.0/8:172.16.0.0/12:192.168.0.0/16
+    restart: unless-stopped
     ports:
       - "25:25"
 
