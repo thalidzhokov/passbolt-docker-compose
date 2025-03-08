@@ -1,0 +1,35 @@
+
+
+services:
+  passbolt:
+    environment:
+      - EMAIL_TRANSPORT_DEFAULT_HOST=${EMAIL_TRANSPORT_DEFAULT_HOST}
+      - EMAIL_TRANSPORT_DEFAULT_PORT=${EMAIL_TRANSPORT_DEFAULT_PORT}
+      - EMAIL_DEFAULT_FROM=${EMAIL_DEFAULT_FROM}
+    depends_on:
+      - mariadb
+      - smtp
+
+  mariadb:
+    image: mariadb:latest
+    container_name: passbolt_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  smtp:
+    image: namshi/smtp
+    container_name: passbolt_smtp
+    environment:
+      - RELAY_NETWORKS=:10.0.0.0/8:172.16.0.0/12:192.168.0.0/16
+    ports:
+      - "25:25"
+
+volumes:
+  mysql_data:

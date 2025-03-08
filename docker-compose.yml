@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  passbolt:
+    image: passbolt/passbolt:latest-ce
+    container_name: passbolt
+    environment:
+      - DATASOURCES_DEFAULT_HOST=${DATASOURCES_DEFAULT_HOST}
+      - DATASOURCES_DEFAULT_USERNAME=${DATASOURCES_DEFAULT_USERNAME}
+      - DATASOURCES_DEFAULT_PASSWORD=${DATASOURCES_DEFAULT_PASSWORD}
+      - DATASOURCES_DEFAULT_DATABASE=${DATASOURCES_DEFAULT_DATABASE}
+      - APP_FULL_BASE_URL=${APP_FULL_BASE_URL}
+    volumes:
+      - passbolt_data:/usr/share/php/passbolt/config/gpg
+      - passbolt_images:/usr/share/php/passbolt/webroot/img/public
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  passbolt_data:
+  passbolt_images:
+
