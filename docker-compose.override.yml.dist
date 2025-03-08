@@ -15,9 +15,9 @@ services:
     container_name: passbolt_db
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${DATASOURCES_DEFAULT_DATABASE}
+      - MYSQL_USER=${DATASOURCES_DEFAULT_USERNAME}
+      - MYSQL_PASSWORD=${DATASOURCES_DEFAULT_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
