@@ -4,29 +4,13 @@ services:
   traefik:
     image: traefik:latest
     container_name: passbolt_traefik
-
-    command:
-      # Uncomment when testing
-      # - --log.level=DEBUG
-
-      - --entrypoints.http.address=:80
-      - --entrypoints.https.address=:443
-
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-
-      - --api=true
-
-      # Uncomment when testing
-      # - --certificatesResolvers.letsencrypt.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
-
-      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
-      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http
-      - --certificatesresolvers.letsencrypt.acme.email=${APP_EMAIL}
-      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+    environment:
+      - APP_EMAIL
     volumes:
-      - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+      - ./traefik/traefik.yaml:/traefik.yaml:ro
+      - ./traefik/conf/:/etc/traefik/conf
     restart: unless-stopped
     ports:
       - "80:80"
@@ -44,11 +28,16 @@ services:
       - EMAIL_DEFAULT_FROM=${APP_EMAIL}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.http.rule=Host(`${APP_DOMAIN}`)
-      - traefik.http.routers.https.rule=Host(`${APP_DOMAIN}`)
-      - traefik.http.routers.https.entrypoints=https
-      - traefik.http.routers.https.tls=true
-      - traefik.http.routers.https.tls.certresolver=${TRAEFIK_CERT_RESOLVER}
+
+      - traefik.http.routers.passbolt-http.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.passbolt-http.entrypoints=web
+      - traefik.http.routers.passbolt-http.middlewares=SslHeader@file
+
+      - traefik.http.routers.passbolt-https.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.passbolt-https.entrypoints=websecure
+      - traefik.http.routers.passbolt-https.middlewares=SslHeader@file
+      - traefik.http.routers.passbolt-https.tls=true
+      - traefik.http.routers.passbolt-https.tls.certresolver=${TRAEFIK_CERT_RESOLVER}
     volumes:
       - passbolt_gpg:/etc/passbolt/gpg
       - passbolt_jwt:/etc/passbolt/jwt
