@@ -4,8 +4,6 @@ services:
   traefik:
     image: traefik:latest
     container_name: passbolt_traefik
-    environment:
-      - APP_EMAIL
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - letsencrypt:/letsencrypt
