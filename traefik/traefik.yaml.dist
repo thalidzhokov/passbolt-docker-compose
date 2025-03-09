@@ -17,7 +17,7 @@ providers:
     watch: true
     exposedByDefault: false
   file:
-    directory: /etc/traefik/conf-providers/
+    directory: /etc/traefik/conf/
     watch: true
 
 api:
