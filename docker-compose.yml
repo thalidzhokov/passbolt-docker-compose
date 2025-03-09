@@ -9,6 +9,7 @@ services:
       - letsencrypt:/letsencrypt
       - ./traefik/traefik.yaml:/traefik.yaml:ro
       - ./traefik/conf/:/etc/traefik/conf
+      - ssl:/etc/ssl
     restart: unless-stopped
     ports:
       - "80:80"
@@ -45,4 +46,4 @@ volumes:
   passbolt_gpg:
   passbolt_jwt:
   letsencrypt:
-
+  ssl:
