@@ -6,12 +6,17 @@ services:
     labels:
       - traefik.enable=true
 
-      - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN}`)
-      - traefik.http.routers.traefik.entrypoints=websecure
-      - traefik.http.routers.traefik.middlewares=auth
-      - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.routers.traefik.tls=true
-      - traefik.http.routers.traefik.tls.certresolver=${TRAEFIK_CERT_RESOLVER}
+      - traefik.http.routers.traefik-http.rule=Host(`${TRAEFIK_DOMAIN}`)
+      - traefik.http.routers.traefik-http.entrypoints=web
+      - traefik.http.routers.traefik-http.middlewares=auth
+      - traefik.http.routers.traefik-http.service=api@internal
+
+      - traefik.http.routers.traefik-https.rule=Host(`${TRAEFIK_DOMAIN}`)
+      - traefik.http.routers.traefik-https.entrypoints=websecure
+      - traefik.http.routers.traefik-https.middlewares=auth
+      - traefik.http.routers.traefik-https.service=api@internal
+      - traefik.http.routers.traefik-https.tls=true
+      - traefik.http.routers.traefik-https.tls.certresolver=${TRAEFIK_CERT_RESOLVER}
 
       # - traefik.http.middlewares.to-https.redirectscheme.scheme=https
       - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD_HASH}
