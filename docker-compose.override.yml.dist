@@ -30,7 +30,7 @@ services:
       - smtp
 
   mariadb:
-    image: mariadb:latest
+    image: mariadb:10.11
     container_name: passbolt_db
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
