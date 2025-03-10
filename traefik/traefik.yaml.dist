@@ -44,7 +44,7 @@ certificatesResolvers:
       storage: /letsencrypt/acme.json
       # Use for testing
       # caServer=https://acme-staging-v02.api.letsencrypt.org/directory
-      caServer: 'https://acme-v02.api.letsencrypt.org/directory'
+      # caServer: 'https://acme-v02.api.letsencrypt.org/directory'
       keyType: EC256
       httpChallenge:
         entryPoint: web
